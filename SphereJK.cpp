@@ -52,6 +52,19 @@ void initGraphics(void)
  */
 void reshape(int w, int h)
 {
+  // The nRange variable is used in the reshape() function to establish the clipping volume. The clipping volume is the region of space that is visible to the camera. The clipping volume is defined by six planes: left, right, bottom, top, near, and far. The nRange variable is used to define the near and far clipping planes.
+
+  // The near clipping plane is the plane that is closest to the camera. The far clipping plane is the plane that is farthest from the camera. Only objects that fall within the clipping volume are visible to the camera.
+
+  // By setting the nRange variable to 100.0f, we are telling OpenGL that the near and far clipping planes are 100 units away from the camera in both the positive and negative directions. This means that only objects that are within 100 units of the camera will be visible.
+
+  // We can change the value of the nRange variable to control the size of the clipping volume. If we want to see more of the scene, we can increase the value of the nRange variable. If we want to see less of the scene, we can decrease the value of the nRange variable.
+
+  GLfloat nRange = 100.0f;
+
+  if (h <= 0)
+    h = 1;
+
   // Sets the viewport to the size of the window.
   glViewport(0, 0, w, h);
 
@@ -66,7 +79,15 @@ void reshape(int w, int h)
   // An orthographic projection is a projection that preserves the parallel lines of the scene.
   // The glOrtho() function takes six arguments: the left, right, bottom, top, near, and far clipping planes.
   // The clipping planes define the region of the scene that is visible.
-  glOrtho(-100.0, 100.0, -100.0, 100.0, -100.0, 100.0);
+
+  if (w <= h)
+  {
+    glOrtho(-nRange, nRange, -nRange * h / w, nRange * h / w, -nRange * 2.0f, nRange * 2.0f);
+  }
+  else
+  {
+    glOrtho(-nRange * w / h, nRange * w / h, nRange, -nRange, -nRange * 2.0f, nRange * 2.0f);
+  };
 
   // Switches to modelview mode.
   // The modelview matrix is used to transform the scene before it is projected onto the screen.
