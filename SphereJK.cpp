@@ -1,5 +1,7 @@
 #include <GL/glut.h>
 
+GLfloat radius = 10.0f;
+
 /**
  * Draws a red sphere at the origin of the window.
  */
@@ -24,7 +26,9 @@ void display(void)
    * The glutSolidSphere() function takes three arguments:
    * the radius of the sphere, the number of slices to use to discretize the sphere, and the number of stacks to use to discretize the sphere.
    */
-  glutSolidSphere(10.0f, 30, 30);
+  glutSolidSphere(radius, 30, 30);
+
+  radius += 0.5f;
 
   /**
    * Swaps the front and back buffers.
@@ -97,6 +101,18 @@ void reshape(int w, int h)
   glLoadIdentity();
 };
 
+// A callback function that is called repeatedly by the GLUT main loop.
+//  It is passed a single argument, value, which is the value that was passed to the glutTimerFunc() function when the timer was started.
+void TimerFunc(int value)
+{
+  // The glutPostRedisplay() function tells GLUT to redraw the window.
+  // This function is typically called from within the timer callback function to cause the animation to update.
+  glutPostRedisplay();
+
+  // Recursion
+  glutTimerFunc(100, TimerFunc, 1);
+};
+
 int main(int argc, char *argv[])
 {
   glutInit(&argc, argv);
@@ -105,6 +121,8 @@ int main(int argc, char *argv[])
   glutCreateWindow("Sphere");
   glutDisplayFunc(display);
   glutReshapeFunc(reshape);
+  glutTimerFunc(100, TimerFunc, 1);
+
   initGraphics();
 
   // A very important function in OpenGL programming, as it allows the program to respond to user input and other events.
