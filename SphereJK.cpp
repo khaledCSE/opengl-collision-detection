@@ -14,6 +14,18 @@ void display(void)
    */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  GLfloat windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+  GLfloat windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+  if (radius <= windowWidth && radius <= windowHeight)
+    radius += 0.5f;
+  else
+    radius = 0.0f;
+
+  glLoadIdentity();
+
+  glTranslatef(-30.0f, -30.0f, 0.0f);
+
   /**
    * Sets the current drawing color to red.
    * The glColor3ub() function takes three arguments: the red, green, and blue components of the color.
@@ -28,7 +40,23 @@ void display(void)
    */
   glutSolidSphere(radius, 30, 30);
 
-  radius += 0.5f;
+  //* Second Sphere
+  glLoadIdentity();
+  glTranslatef(30.0f, 30.0f, 0.0f); //* Translate the second one 30 units from first
+  glColor3ub(255, 255, 0);
+  glutSolidSphere(radius, 30, 30);
+
+  //* Third Sphere
+  glLoadIdentity();
+  glTranslatef(-30.0f, 30.0f, 0.0f); //* Translate the second one 30 units from second
+  glColor3ub(0, 0, 255);
+  glutSolidSphere(radius, 30, 30);
+
+  //* Fourth Sphere
+  glLoadIdentity();
+  glTranslatef(30.0f, -30.0f, 0.0f); //* Translate the second one 30 units from third
+  glColor3ub(255, 0, 0);
+  glutSolidSphere(radius, 30, 30);
 
   /**
    * Swaps the front and back buffers.
