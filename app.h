@@ -8,4 +8,5 @@ public:
   virtual void initGraphics();
   virtual void display();
   virtual void resize(int width, int height);
+  virtual void update();
 };
