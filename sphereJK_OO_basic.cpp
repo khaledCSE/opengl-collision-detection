@@ -69,9 +69,20 @@ void SphereDemo::display()
 {
   Application::display();
 
-  glTranslatef(x, y, 0.0f);
+  // * Go 50 units up the Y-axis
+  glLoadIdentity();
+  glPushMatrix();
+  glTranslatef(0.0f, -50.0f, 0.0f);
   glColor3ub(255, 0, 0);
-  glutSolidSphere(radius, 30, 30);
+  glutSolidSphere(10, 30, 30);
+  glPopMatrix();
+
+  // * Go 50 units towards X-axis
+  glTranslatef(50.0f, 0.0f, 0.0f);
+  glColor3ub(0, 255, 0);
+  glutSolidSphere(10, 30, 30);
+  glPopMatrix();
+
   glutSwapBuffers();
 }
 
