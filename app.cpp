@@ -47,3 +47,13 @@ void Application::resize(int width, int height)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 }
+
+float Application::getTimeInterval()
+{
+  return timeInterval;
+}
+
+void Application::setTimeInterval(float timeInt)
+{
+  timeInterval = timeInt;
+}

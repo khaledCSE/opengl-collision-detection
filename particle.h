@@ -1,8 +1,9 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
+#endif
 #include "coreMath.h"
 
-class particle
+class Particle
 {
 protected:
   Vector2 position;

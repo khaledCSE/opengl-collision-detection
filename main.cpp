@@ -1,7 +1,7 @@
 #include <GL/glut.h>
 #include "app.h"
 
-GLfloat timeInterval = 100.0f;
+GLfloat timeInterval = 10000000.0f;
 
 extern Application *getApplication();
 Application *app;
@@ -26,7 +26,7 @@ void resize(int width, int height)
 void TimerFunc(int value)
 {
   app->update();
-  glutTimerFunc(timeInterval, TimerFunc, 1);
+  glutTimerFunc(100.f, TimerFunc, 1);
 }
 
 int main(int argc, char *argv[])
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   createWindow("Sphere");
   glutReshapeFunc(resize);
   glutDisplayFunc(display);
-  glutTimerFunc(timeInterval, TimerFunc, 1);
+  glutTimerFunc(100.f, TimerFunc, 1);
   app->initGraphics();
   glutMainLoop();
 

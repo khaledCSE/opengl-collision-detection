@@ -1,101 +1,66 @@
 #include <GL/glut.h>
 #include "app.h"
-
-// * Possible directions in a 2D space
-enum Direction
-{
-  TOP,
-  BOTTOM,
-  LEFT,
-  RIGHT,
-  TOP_RIGHT,
-  TOP_LEFT,
-  BOTTOM_RIGHT,
-  BOTTOM_LEFT,
-};
+#include "particle.h"
 
 class SphereDemo : public Application
 {
-  int radius = 10;
-  int x = 0;
-  int y = 0;
-  int xStep = 2;
-  int yStep = 2;
+  Particle particle;
 
 public:
+  SphereDemo();
   virtual void display();
   virtual void update();
-  virtual void changeDirection(Direction direction);
 };
 
-void SphereDemo::changeDirection(Direction direction)
+SphereDemo::SphereDemo()
 {
-  switch (direction)
-  {
-  case TOP:
-    y -= yStep;
-    break;
-  case BOTTOM:
-    y += yStep;
-    break;
-  case LEFT:
-    x -= xStep;
-    break;
-  case RIGHT:
-    x += xStep;
-    break;
-  case TOP_LEFT:
-    y -= yStep;
-    x -= xStep;
-    break;
-  case TOP_RIGHT:
-    x += xStep;
-    y -= yStep;
-    break;
-  case BOTTOM_LEFT:
-    x -= xStep;
-    y += yStep;
-    break;
-  case BOTTOM_RIGHT:
-    x += xStep;
-    y += yStep;
-    break;
-  default:
-    break;
-  }
+  particle.setPosition(0, 0);
+  particle.setVelocity(-100, 101);
+  particle.setRadius(10);
+  // * Setting time interval while setting every other property
+  Application::setTimeInterval(5);
 }
 
 void SphereDemo::display()
 {
   Application::display();
 
+  Vector2 position = particle.getPosition();
+
   // * Go 50 units up the Y-axis
   glLoadIdentity();
   glPushMatrix();
-  glTranslatef(0.0f, -50.0f, 0.0f);
+  glTranslatef(position.x, position.y, 0.0f);
   glColor3ub(255, 0, 0);
   glutSolidSphere(10, 30, 30);
   glPopMatrix();
 
   // * Go 50 units towards X-axis
-  glTranslatef(50.0f, 0.0f, 0.0f);
-  glColor3ub(0, 255, 0);
-  glutSolidSphere(10, 30, 30);
-  glPopMatrix();
+  // glTranslatef(50.0f, 0.0f, 0.0f);
+  // glColor3ub(0, 255, 0);
+  // glutSolidSphere(10, 30, 30);
+  // glPopMatrix();
 
   glutSwapBuffers();
 }
 
-void SphereDemo::update()
+void SphereDemo::update(void)
 {
-  // x += xStep;
-  // y += yStep;
-  changeDirection(TOP_LEFT);
+  float radius = particle.getRadius();
+  float duration = timeInterval / 100;
 
-  if (radius <= Application::height && radius <= Application::width)
-    radius++;
-  else
-    radius = 0;
+  particle.integrate(duration);
+
+  Vector2 position = particle.getPosition();
+  Vector2 velocity = particle.getVelocity();
+
+  // * Reverse the direction when you reach left or right edge
+  if (position.x > Application::width - radius || position.x < -Application::width + radius)
+    particle.setVelocity(-velocity.x, velocity.y);
+  if (position.y > Application::height - radius || position.y < -Application::height + radius)
+    particle.setVelocity(velocity.x, -velocity.y);
+
+  particle.setPosition(position.x, position.y);
   Application::update();
 }
 
