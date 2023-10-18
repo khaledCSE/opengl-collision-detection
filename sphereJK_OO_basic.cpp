@@ -1,3 +1,4 @@
+#include <cmath>
 #include <vector>
 #include <iostream>
 #include <GL/glut.h>
@@ -64,23 +65,6 @@ void SphereDemo::display()
     glPopMatrix();
   }
 
-  // Vector2 position1 = particle1.getPosition();
-  // Vector2 position2 = particle2.getPosition();
-
-  // // * Go 50 units up the Y-axis
-  // glLoadIdentity();
-  // glPushMatrix();
-  // glTranslatef(position1.x, position1.y, 0.0f);
-  // glColor3ub(255, 0, 0);
-  // glutSolidSphere(10, 30, 30);
-  // glPopMatrix();
-
-  // // * Go 50 units towards X-axis
-  // glTranslatef(position2.x, position2.y, 0.0f);
-  // glColor3ub(0, 255, 0);
-  // glutSolidSphere(10, 30, 30);
-  // glPopMatrix();
-
   glutSwapBuffers();
 }
 
@@ -103,34 +87,28 @@ void SphereDemo::update(void)
     if (position.y > Application::height - radius || position.y < -Application::height + radius)
       particles[i].setVelocity(velocity.x, -velocity.y);
 
+    // * Collision Detection
+    // d=√((x2 – x1)² + (y2 – y1)²)
+    // d <= r1 + r2
+
+    if (i < sizeof(particles) - 1)
+    {
+      Vector2 position2 = particles[i + 1].getPosition();
+      Vector2 velocity2 = particles[i + 1].getVelocity();
+
+      float d = sqrt(pow((position2.x - position.x), 2) + pow((position2.y - position.y), 2));
+
+      if (d <= float(radius + radius))
+      {
+        particles[i].setVelocity(-velocity.x, -velocity.y);
+        particles[i + 1].setVelocity(-velocity2.x, -velocity2.y);
+      }
+      particles[i + 1].setPosition(position2.x, position2.y);
+    }
+
     particles[i].setPosition(position.x, position.y);
   }
 
-  // float radius = particle1.getRadius();
-
-  // particle1.integrate(duration);
-  // particle2.integrate(duration);
-
-  // Vector2 position1 = particle1.getPosition();
-  // Vector2 velocity1 = particle1.getVelocity();
-
-  // Vector2 position2 = particle2.getPosition();
-  // Vector2 velocity2 = particle2.getVelocity();
-
-  // * Reverse the direction when you reach left or right edge
-  // if (position1.x > Application::width - radius || position1.x < -Application::width + radius)
-  //   particle1.setVelocity(-velocity1.x, velocity1.y);
-  // if (position1.y > Application::height - radius || position1.y < -Application::height + radius)
-  //   particle1.setVelocity(velocity1.x, -velocity1.y);
-
-  // * For second particle
-  // if (position2.x > Application::width - radius || position2.x < -Application::width + radius)
-  //   particle2.setVelocity(-velocity2.x, velocity2.y);
-  // if (position2.y > Application::height - radius || position2.y < -Application::height + radius)
-  //   particle2.setVelocity(velocity2.x, -velocity2.y);
-
-  // particle1.setPosition(position1.x, position1.y);
-  // particle2.setPosition(position2.x, position2.y);
   Application::update();
 }
 
