@@ -19,6 +19,7 @@ public:
   SphereDemo();
   virtual void display();
   virtual void update();
+  int generate_random_int_between(int min, int max);
 };
 
 SphereDemo::SphereDemo()
@@ -28,7 +29,9 @@ SphereDemo::SphereDemo()
 
   for (int i = 0; i < number_of_particles; i++)
   {
-    particles[i].setPosition(i * 50, 0);
+    // TODO:
+    // * Mind the radius: here is 10
+    particles[i].setPosition(i * 89, 0);
     particles[i].setVelocity(-100, 101);
     particles[i].setRadius(10);
   }
