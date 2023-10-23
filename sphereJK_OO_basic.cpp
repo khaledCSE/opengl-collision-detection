@@ -9,16 +9,15 @@ using namespace std;
 
 class SphereDemo : public Application
 {
-  Particle particle1;
-  Particle particle2;
-  Particle particle;
-
   Particle particles[2];
 
 public:
   SphereDemo();
   virtual void display();
   virtual void update();
+  bool detect_out_of_the_box(Particle *particle);
+  void resolve_box_collision(Particle *particle);
+  void resolve_particle_collision(Particle *p1, Particle *p2);
   int generate_random_int_between(int min, int max);
 };
 
@@ -32,17 +31,9 @@ SphereDemo::SphereDemo()
     // TODO:
     // * Mind the radius: here is 10
     particles[i].setPosition(i * 89, 0);
-    particles[i].setVelocity(-100, 101);
+    particles[i].setVelocity(-50, 51);
     particles[i].setRadius(10);
   }
-
-  // particle1.setPosition(0, 0);
-  // particle1.setVelocity(-100, 101);
-  // particle1.setRadius(10);
-
-  // particle2.setPosition(50, 0);
-  // particle2.setVelocity(-100, 101);
-  // particle2.setRadius(10);
   // * Setting time interval while setting every other property
   Application::setTimeInterval(5);
 }
@@ -54,9 +45,6 @@ void SphereDemo::display()
   glLoadIdentity();
   for (int i = 0; i < sizeof(particles); i++)
   {
-    // * Go 50 units up the Y-axis
-    // * Change the color on G values only
-
     Vector2 position = particles[i].getPosition();
     if (i == 0)
     {
@@ -84,35 +72,95 @@ void SphereDemo::update(void)
     Vector2 position = particles[i].getPosition();
     Vector2 velocity = particles[i].getVelocity();
 
-    // * Reverse the direction when you reach left or right edge
-    if (position.x > Application::width - radius || position.x < -Application::width + radius)
-      particles[i].setVelocity(-velocity.x, velocity.y);
-    if (position.y > Application::height - radius || position.y < -Application::height + radius)
-      particles[i].setVelocity(velocity.x, -velocity.y);
-
-    // * Collision Detection
-    // d=√((x2 – x1)² + (y2 – y1)²)
-    // d <= r1 + r2
-
-    if (i < sizeof(particles) - 1)
+    if (detect_out_of_the_box(&particles[i]))
     {
-      Vector2 position2 = particles[i + 1].getPosition();
-      Vector2 velocity2 = particles[i + 1].getVelocity();
-
-      float d = sqrt(pow((position2.x - position.x), 2) + pow((position2.y - position.y), 2));
-
-      if (d <= float(radius + radius))
+      resolve_box_collision(&particles[i]);
+    }
+    else
+    {
+      if (i < sizeof(particles) - 1)
       {
-        particles[i].setVelocity(-velocity.x, -velocity.y);
-        particles[i + 1].setVelocity(-velocity2.x, -velocity2.y);
+        resolve_particle_collision(&particles[i], &particles[i + 1]);
       }
-      particles[i + 1].setPosition(position2.x, position2.y);
     }
 
-    particles[i].setPosition(position.x, position.y);
+    // * Reverse the direction when you reach left or right edge
   }
 
   Application::update();
+}
+
+bool SphereDemo::detect_out_of_the_box(Particle *particle)
+{
+  float radius = particle->getRadius();
+  Vector2 position = particle->getPosition();
+
+  // Check if the particle is out of the box bounds
+  if (position.x + radius > Application::width ||
+      position.x - radius < -Application::width ||
+      position.y + radius > Application::height ||
+      position.y - radius < -Application::height)
+  {
+    return true; // Particle is out of the box
+  }
+  return false; // Particle is within the box
+}
+
+void SphereDemo::resolve_box_collision(Particle *particle)
+{
+  float radius = particle->getRadius();
+  Vector2 position = particle->getPosition();
+  Vector2 velocity = particle->getVelocity();
+
+  // Check for collisions with the boundary
+  if (position.x > Application::width - radius)
+  {
+    position.x = Application::width - radius;
+    velocity.x = -velocity.x;
+  }
+  else if (position.x < -Application::width + radius)
+  {
+    position.x = -Application::width + radius;
+    velocity.x = -velocity.x;
+  }
+
+  if (position.y > Application::height - radius)
+  {
+    position.y = Application::height - radius;
+    velocity.y = -velocity.y;
+  }
+  else if (position.y < -Application::height + radius)
+  {
+    position.y = -Application::height + radius;
+    velocity.y = -velocity.y;
+  }
+
+  // Update the position with corrections
+  particle->setPosition(position.x, position.y);
+  particle->setVelocity(velocity.x, velocity.y);
+}
+
+void SphereDemo::resolve_particle_collision(Particle *p1, Particle *p2)
+{
+  Vector2 position = p1->getPosition();
+  Vector2 velocity = p1->getVelocity();
+
+  Vector2 position2 = p2->getPosition();
+  Vector2 velocity2 = p2->getVelocity();
+
+  // * Collision Detection
+  // d=√((x2 – x1)² + (y2 – y1)²)
+  // d <= r1 + r2
+
+  float d = sqrt(pow((position2.x - position.x), 2) + pow((position2.y - position.y), 2));
+
+  if (d <= float(p1->getRadius() + p2->getRadius()))
+  {
+    p1->setVelocity(-velocity.x, -velocity.y);
+    p2->setVelocity(-velocity2.x, -velocity2.y);
+  }
+  p1->setPosition(position.x, position.y);
+  p2->setPosition(position2.x, position2.y);
 }
 
 Application *getApplication()
