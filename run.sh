@@ -36,7 +36,7 @@ else
     cli_args="-lGL -lGLU -lglut -lm"
 fi
 
-command="g++ -o $output $main_file $dependencies $cli_args && ./$output"
+command="g++ -o $output $main_file $dependencies $cli_args && ./$output -std=c++17"
 
 echo "Running command: $command"
 eval $command

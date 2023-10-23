@@ -1,6 +1,7 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include <random>
 #include <GL/glut.h>
 #include "app.h"
 #include "particle.h"
@@ -19,6 +20,7 @@ public:
   void resolve_box_collision(Particle *particle);
   void resolve_particle_collision(Particle *p1, Particle *p2);
   int generate_random_int_between(int min, int max);
+  RGB generate_random_rgb();
 };
 
 SphereDemo::SphereDemo()
@@ -30,10 +32,18 @@ SphereDemo::SphereDemo()
   {
     Particle particle;
 
+    // * Generate a color
+    RGB color = generate_random_rgb();
+
+    cout << "r: " << color.r << endl;
+    cout << "g: " << color.g << endl;
+    cout << "b: " << color.b << endl;
+
     // * Mind the radius: here is 10
     particle.setPosition(i * 89, 0);
-    particle.setVelocity(-50, 51);
+    particle.setVelocity(100, 101);
     particle.setRadius(10);
+    particle.setColor(color);
     particles.push_back(particle);
   }
   // * Setting time interval while setting every other property
@@ -48,13 +58,14 @@ void SphereDemo::display()
   for (int i = 0; i < particles.size(); i++)
   {
     Vector2 position = particles[i].getPosition();
+    float radius = particles[i].getRadius();
     if (i == 0)
     {
       glPushMatrix();
     }
     glTranslatef(position.x, position.y, 0.0f);
-    glColor3ub(255, i * 50, 0);
-    glutSolidSphere(10, 30, 30);
+    glColor3ub(particles[i].color.r, particles[i].color.g, particles[i].color.b);
+    glutSolidSphere(radius, 30, 30);
     glPopMatrix();
   }
 
@@ -161,6 +172,23 @@ void SphereDemo::resolve_particle_collision(Particle *p1, Particle *p2)
   }
   p1->setPosition(position.x, position.y);
   p2->setPosition(position2.x, position2.y);
+}
+
+RGB SphereDemo::generate_random_rgb()
+{
+  random_device rd;
+  mt19937 gen(rd());
+  uniform_int_distribution<> dist(0, 255);
+
+  // Generate a random RGB color, making sure that it is not too dark.
+  float r = dist(gen);
+  float g = dist(gen);
+  float b = dist(gen);
+
+  g = abs(r - g) < 100 ? 0 : g;
+  b = abs(g - b) < 100 ? 255 : b;
+
+  return {r, g, b};
 }
 
 Application *getApplication()

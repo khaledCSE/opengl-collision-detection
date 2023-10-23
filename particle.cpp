@@ -37,3 +37,15 @@ Vector2 Particle::getVelocity() const
 {
   return velocity;
 }
+
+RGB Particle::getColor()
+{
+  return RGB();
+}
+
+void Particle::setColor(RGB rgb)
+{
+  color.r = rgb.r;
+  color.g = rgb.g;
+  color.b = rgb.b;
+}
