@@ -9,7 +9,7 @@ using namespace std;
 
 class SphereDemo : public Application
 {
-  Particle particles[2];
+  vector<Particle> particles;
 
 public:
   SphereDemo();
@@ -28,11 +28,13 @@ SphereDemo::SphereDemo()
 
   for (int i = 0; i < number_of_particles; i++)
   {
-    // TODO:
+    Particle particle;
+
     // * Mind the radius: here is 10
-    particles[i].setPosition(i * 89, 0);
-    particles[i].setVelocity(-50, 51);
-    particles[i].setRadius(10);
+    particle.setPosition(i * 89, 0);
+    particle.setVelocity(-50, 51);
+    particle.setRadius(10);
+    particles.push_back(particle);
   }
   // * Setting time interval while setting every other property
   Application::setTimeInterval(5);
@@ -43,7 +45,7 @@ void SphereDemo::display()
   Application::display();
 
   glLoadIdentity();
-  for (int i = 0; i < sizeof(particles); i++)
+  for (int i = 0; i < particles.size(); i++)
   {
     Vector2 position = particles[i].getPosition();
     if (i == 0)
@@ -63,7 +65,7 @@ void SphereDemo::update(void)
 {
   float duration = timeInterval / 100;
 
-  for (int i = 0; i < sizeof(particles); i++)
+  for (int i = 0; i < particles.size(); i++)
   {
     float radius = particles[i].getRadius();
 
@@ -78,13 +80,11 @@ void SphereDemo::update(void)
     }
     else
     {
-      if (i < sizeof(particles) - 1)
+      if (i < particles.size() - 1)
       {
         resolve_particle_collision(&particles[i], &particles[i + 1]);
       }
     }
-
-    // * Reverse the direction when you reach left or right edge
   }
 
   Application::update();
