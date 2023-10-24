@@ -40,8 +40,9 @@ SphereDemo::SphereDemo()
     cout << "b: " << color.b << endl;
 
     // * Mind the radius: here is 10
+    // ! Max velocity: (+-) 95 is the safest, else particles might overlap while colliding each other
     particle.setPosition(i * 89, 0);
-    particle.setVelocity(100, 101);
+    particle.setVelocity(95, 95);
     particle.setRadius(10);
     particle.setColor(color);
     particles.push_back(particle);
