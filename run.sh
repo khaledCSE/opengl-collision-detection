@@ -32,7 +32,7 @@ if [ $mode == 2 ]; then
 else
     output="output"
     main_file="main.cpp"
-    dependencies="app.cpp app.h coreMath.h particle.h particle.cpp sphereJK_OO_basic.cpp"
+    dependencies="app.cpp app.h coreMath.h particle.h particle.cpp pcontacts.h pcontacts.cpp pworld.h pworld.cpp BlobDemo.cpp"
     cli_args="-lGL -lGLU -lglut -lm"
 fi
 

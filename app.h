@@ -1,15 +1,23 @@
+
 class Application
 {
 protected:
-  int height;
-  int width;
-  float timeInterval;
-
+    int height;
+    int width;
+	float nRange;
+	float timeinterval;
 public:
-  virtual void initGraphics();
-  virtual void display();
-  virtual void resize(int width, int height);
-  virtual void update();
-  virtual float getTimeInterval();
-  virtual void setTimeInterval(float timeInt);
-};
+    virtual void initGraphics();
+    virtual void display();
+	virtual void update();
+    virtual void resize(int width, int height);
+	int getheight();
+	int getwidth();
+	float getTimeinterval();
+	void setTimeinterval(float timeint);
+ };
+
+
+
+    
+

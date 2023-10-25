@@ -1,46 +1,45 @@
 #include <GL/glut.h>
+
 #include "app.h"
-
-GLfloat timeInterval = 10000000.0f;
-
 extern Application *getApplication();
 Application *app;
 
 void display(void)
 {
-  app->display();
+	app->display();
 }
 
-void createWindow(const char *title)
+void createWindow(const char *title, int h, int w)
 {
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-  glutInitWindowSize(600, 600);
-  glutCreateWindow(title);
-}
-
-void resize(int width, int height)
-{
-  app->resize(width, height);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitWindowSize(w, h);
+	glutCreateWindow(title);
 }
 
 void TimerFunc(int value)
 {
-  app->update();
-  glutTimerFunc(100.f, TimerFunc, 1);
+	app->update();
+	float timeinterval = app->getTimeinterval();
+	glutTimerFunc(timeinterval, TimerFunc, 1);
+}
+
+void resize(int width, int height)
+{
+	app->resize(width, height);
 }
 
 int main(int argc, char *argv[])
 {
-  glutInit(&argc, argv);
-  app = getApplication();
-  createWindow("Sphere");
-  glutReshapeFunc(resize);
-  glutDisplayFunc(display);
-  glutTimerFunc(100.f, TimerFunc, 1);
-  app->initGraphics();
-  glutMainLoop();
-
-  delete app;
-
-  return 0;
+	glutInit(&argc, argv);
+	app = getApplication();
+	float timeinterval = 10;
+	app->setTimeinterval(timeinterval);
+	createWindow("Blob", app->getheight(), app->getwidth());
+	glutReshapeFunc(resize);
+	glutDisplayFunc(display);
+	glutTimerFunc(timeinterval, TimerFunc, 1);
+	app->initGraphics();
+	glutMainLoop();
+	delete app;
+	return 0;
 }
