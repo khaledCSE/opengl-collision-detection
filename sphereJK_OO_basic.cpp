@@ -35,15 +35,26 @@ SphereDemo::SphereDemo()
     // * Generate a color
     RGB color = generate_random_rgb();
 
-    cout << "r: " << color.r << endl;
-    cout << "g: " << color.g << endl;
-    cout << "b: " << color.b << endl;
+    // cout << "r: " << color.r << endl;
+    // cout << "g: " << color.g << endl;
+    // cout << "b: " << color.b << endl;
 
     // * Mind the radius: here is 10
     // ! Max velocity: (+-) 95 is the safest, else particles might overlap while colliding each other
-    particle.setPosition(i * 89, 0);
-    particle.setVelocity(95, 95);
-    particle.setRadius(10);
+    int posX = generate_random_int_between(-85, 85);
+    int posY = generate_random_int_between(-85, 85);
+
+    int velX = generate_random_int_between(40, 85);
+    int velY = generate_random_int_between(40, 85);
+
+    int radius = generate_random_int_between(10, 20);
+
+    cout << "velX:" << velX << endl;
+    cout << "velY:" << velY << endl;
+
+    particle.setPosition(posX, posY);
+    particle.setVelocity(velX, velY);
+    particle.setRadius(radius);
     particle.setColor(color);
     particles.push_back(particle);
   }
@@ -173,6 +184,16 @@ void SphereDemo::resolve_particle_collision(Particle *p1, Particle *p2)
   }
   p1->setPosition(position.x, position.y);
   p2->setPosition(position2.x, position2.y);
+}
+
+int SphereDemo::generate_random_int_between(int min, int max)
+{
+  random_device rd;
+  mt19937 gen(rd());
+  uniform_int_distribution<> dist(min, max);
+
+  int num = dist(gen);
+  return num;
 }
 
 RGB SphereDemo::generate_random_rgb()
