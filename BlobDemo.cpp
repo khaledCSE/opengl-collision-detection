@@ -17,6 +17,9 @@ const Vector2 Vector2::GRAVITY = Vector2(0, -9.81);
  * particles can rest. Platforms are also contact generators for the physics.
  */
 
+const int NUMBER_OF_PLATFORMS = 7;
+const int BOX_MARGIN = 5;
+
 class Platform : public ParticleContactGenerator
 {
 public:
@@ -137,10 +140,11 @@ BlobDemo::BlobDemo() : world(2, 1)
     blob = new Particle;
 
     // Create the platform
-    platform = new Platform[7];
+    platform = new Platform[NUMBER_OF_PLATFORMS];
 
-    int margin = 5;
+    int margin = BOX_MARGIN;
 
+    // * Platforms inside the box have arbitrary values
     platform[0].start = Vector2(0.0, 0.0);
     platform[0].end = Vector2(50.0, -10.0);
 
@@ -191,50 +195,16 @@ void BlobDemo::display()
 {
     Application::display();
 
-    const Vector2 &p0 = platform[0].start;
-    const Vector2 &p1 = platform[0].end;
-
-    // * Box
-    const Vector2 &p2 = platform[3].start;
-    const Vector2 &p3 = platform[3].end;
-
-    const Vector2 &p4 = platform[4].start;
-    const Vector2 &p5 = platform[4].end;
-
-    const Vector2 &p6 = platform[5].start;
-    const Vector2 &p7 = platform[5].end;
-
-    const Vector2 &p8 = platform[6].start;
-    const Vector2 &p9 = platform[6].end;
-
-    const Vector2 &p10 = platform[1].start;
-    const Vector2 &p11 = platform[1].end;
-
-    const Vector2 &p12 = platform[2].start;
-    const Vector2 &p13 = platform[2].end;
-
     glBegin(GL_LINES);
     glColor3f(0, 1, 1);
-    glVertex2f(p0.x, p0.y);
-    glVertex2f(p1.x, p1.y);
+    for (int i = 0; i < NUMBER_OF_PLATFORMS; i++)
+    {
+        const Vector2 &p0 = platform[i].start;
+        const Vector2 &p1 = platform[i].end;
 
-    glVertex2f(p2.x, p2.y);
-    glVertex2f(p3.x, p3.y);
-
-    glVertex2f(p4.x, p4.y);
-    glVertex2f(p5.x, p5.y);
-
-    glVertex2f(p6.x, p6.y);
-    glVertex2f(p7.x, p7.y);
-
-    glVertex2f(p8.x, p8.y);
-    glVertex2f(p9.x, p9.y);
-
-    glVertex2f(p10.x, p10.y);
-    glVertex2f(p11.x, p11.y);
-
-    glVertex2f(p12.x, p12.y);
-    glVertex2f(p13.x, p13.y);
+        glVertex2f(p0.x, p0.y);
+        glVertex2f(p1.x, p1.y);
+    }
 
     glEnd();
 
