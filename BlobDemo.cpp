@@ -19,6 +19,7 @@ const Vector2 Vector2::GRAVITY = Vector2(0, -9.81);
 
 const int NUMBER_OF_PLATFORMS = 7;
 const int BOX_MARGIN = 5;
+const int NUMBER_OF_BLOBS = 3;
 
 class Platform : public ParticleContactGenerator
 {
