@@ -41,7 +41,7 @@ unsigned Platform::addContact(ParticleContact *contact,
 {
 
     // const static float restitution = 0.8f;
-    const static float restitution = 1.0f;
+    float restitution = coeff_of_restitution;
     unsigned used = 0;
 
     // Check for penetration
@@ -148,26 +148,33 @@ BlobDemo::BlobDemo() : world(2, 1)
     // * Platforms inside the box have arbitrary values
     platform[0].start = Vector2(0.0, 0.0);
     platform[0].end = Vector2(50.0, -10.0);
+    platform[0].coeff_of_restitution = 0.6f;
 
     platform[1].start = Vector2(-80.0, -30.0);
     platform[1].end = Vector2(-10.0, -70.0);
+    platform[1].coeff_of_restitution = 0.9f;
 
     platform[2].start = Vector2(0.0, -65.0);
     platform[2].end = Vector2(80.0, -30.0);
+    platform[2].coeff_of_restitution = 0.8f;
 
     // * Creating a box
     int box_edge_point = nRange - margin;
     platform[3].start = Vector2(-box_edge_point, -box_edge_point);
     platform[3].end = Vector2(-box_edge_point, box_edge_point);
+    platform[3].coeff_of_restitution = 1.0f;
 
     platform[4].start = Vector2(-box_edge_point, box_edge_point);
     platform[4].end = Vector2(box_edge_point, box_edge_point);
+    platform[4].coeff_of_restitution = 1.0f;
 
     platform[5].start = Vector2(box_edge_point, box_edge_point);
     platform[5].end = Vector2(box_edge_point, -box_edge_point);
+    platform[5].coeff_of_restitution = 1.0f;
 
     platform[6].start = Vector2(-box_edge_point, -box_edge_point);
     platform[6].end = Vector2(box_edge_point, -box_edge_point);
+    platform[6].coeff_of_restitution = 1.0f;
 
     // Make sure the platform knows which particle it should collide with.
     platform->particle = blob;
