@@ -121,4 +121,9 @@
 
 	
 
+    class ParticleCollisio{
+    
+
+    };
+
 #endif // CONTACTS_H

@@ -10,6 +10,9 @@
 #include <stdio.h>
 #include <cassert>
 
+#define BLOB_COUNT 6
+#define PLATFORM_COUNT 2
+
 const Vector2 Vector2::GRAVITY = Vector2(0, -9.81);
 
 /**
@@ -39,73 +42,74 @@ unsigned Platform::addContact(ParticleContact *contact,
     // const static float restitution = 0.8f;
     const static float restitution = 1.0f;
     unsigned used = 0;
-
-    // Check for penetration
-    Vector2 toParticle = particle->getPosition() - start;
-    Vector2 lineDirection = end - start;
-
-    float projected = toParticle * lineDirection;
-    float platformSqLength = lineDirection.squareMagnitude();
-    float squareRadius = particle->getRadius() * particle->getRadius();
-    ;
-
-    if (projected <= 0)
+    for (int i = 0; i < BLOB_COUNT; i++)
     {
+        // Check for penetration
+        Vector2 toParticle = particle[i].getPosition() - start;
+        Vector2 lineDirection = end - start;
 
-        // The blob is nearest to the start point
-        if (toParticle.squareMagnitude() < squareRadius)
+        float projected = toParticle * lineDirection;
+        float platformSqLength = lineDirection.squareMagnitude();
+        float squareRadius = particle[i].getRadius() * particle[i].getRadius();
+        ;
+
+        if (projected <= 0)
         {
-            // We have a collision
-            contact->contactNormal = toParticle.unit();
-            contact->restitution = restitution;
-            contact->particle[0] = particle;
-            contact->particle[1] = 0;
-            contact->penetration = particle->getRadius() - toParticle.magnitude();
-            used++;
-            contact++;
+
+            // The blob is nearest to the start point
+            if (toParticle.squareMagnitude() < squareRadius)
+            {
+                // We have a collision
+                contact->contactNormal = toParticle.unit();
+                contact->restitution = restitution;
+                contact->particle[0] = particle + i;
+                contact->particle[1] = 0;
+                contact->penetration = particle[i].getRadius() - toParticle.magnitude();
+                used++;
+                contact++;
+            }
+        }
+        else if (projected >= platformSqLength)
+        {
+            // The blob is nearest to the end point
+            toParticle = particle[i].getPosition() - end;
+            if (toParticle.squareMagnitude() < squareRadius)
+            {
+                // We have a collision
+                contact->contactNormal = toParticle.unit();
+                contact->restitution = restitution;
+                contact->particle[0] = particle + i;
+                contact->particle[1] = 0;
+                contact->penetration = particle[i].getRadius() - toParticle.magnitude();
+                used++;
+                contact++;
+            }
+        }
+        else
+        {
+            // the blob is nearest to the middle.
+            float distanceToPlatform = toParticle.squareMagnitude() - projected * projected / platformSqLength;
+            if (distanceToPlatform < squareRadius)
+            {
+                // We have a collision
+                Vector2 closestPoint = start + lineDirection * (projected / platformSqLength);
+
+                contact->contactNormal = (particle[i].getPosition() - closestPoint).unit();
+                contact->restitution = restitution;
+                contact->particle[0] = particle + i;
+                contact->particle[1] = 0;
+                contact->penetration = particle[i].getRadius() - sqrt(distanceToPlatform);
+                used++;
+                contact++;
+            }
         }
     }
-    else if (projected >= platformSqLength)
-    {
-        // The blob is nearest to the end point
-        toParticle = particle->getPosition() - end;
-        if (toParticle.squareMagnitude() < squareRadius)
-        {
-            // We have a collision
-            contact->contactNormal = toParticle.unit();
-            contact->restitution = restitution;
-            contact->particle[0] = particle;
-            contact->particle[1] = 0;
-            contact->penetration = particle->getRadius() - toParticle.magnitude();
-            used++;
-            contact++;
-        }
-    }
-    else
-    {
-        // the blob is nearest to the middle.
-        float distanceToPlatform = toParticle.squareMagnitude() - projected * projected / platformSqLength;
-        if (distanceToPlatform < squareRadius)
-        {
-            // We have a collision
-            Vector2 closestPoint = start + lineDirection * (projected / platformSqLength);
-
-            contact->contactNormal = (particle->getPosition() - closestPoint).unit();
-            contact->restitution = restitution;
-            contact->particle[0] = particle;
-            contact->particle[1] = 0;
-            contact->penetration = particle->getRadius() - sqrt(distanceToPlatform);
-            used++;
-            contact++;
-        }
-    }
-
     return used;
 }
 
 class BlobDemo : public Application
 {
-    Particle *blob;
+    Particle *blobs;
 
     Platform *platform;
 
@@ -124,69 +128,83 @@ public:
 
     /** Update the particle positions. */
     virtual void update();
+    Platform *buildPlatform();
 };
 
 // Method definitions
-BlobDemo::BlobDemo() : world(2, 1)
+BlobDemo::BlobDemo() : world(10, 5)
 {
+
     width = 400;
     height = 400;
     nRange = 100.0;
 
-    // Create the blob storage
-    blob = new Particle;
+    blobs = new Particle[BLOB_COUNT];
+    platform = buildPlatform();
 
-    // Create the platform
-    platform = new Platform;
+    for (int i = 0; i < PLATFORM_COUNT; i++)
+    {
+        platform[i].particle = blobs;
+        world.getContactGenerators().push_back(platform + i);
+    }
 
-    platform->start = Vector2(-50.0, 0.0);
-    platform->end = Vector2(50.0, 0.0);
-
-    // Make sure the platform knows which particle it should collide with.
-    platform->particle = blob;
-
-    world.getContactGenerators().push_back(platform);
-
-    // Create the blob
-    blob->setPosition(0.0, 90.0);
-    blob->setRadius(5);
-    blob->setVelocity(0, 0);
-    // blob->setDamping(0.9);
-    blob->setDamping(1.0);
-    blob->setAcceleration(Vector2::GRAVITY * 20.0f);
-
-    blob->setMass(30.0f);
-    blob->clearAccumulator();
-    world.getParticles().push_back(blob);
+    for (int i = 0; i < BLOB_COUNT; i++)
+    {
+        blobs[i].setPosition(20.0 + i * 10, 90.0);
+        blobs[i].setRadius(5);
+        blobs[i].setVelocity(0, 0);
+        blobs[i].setDamping(0.9);
+        blobs[i].setAcceleration(Vector2::GRAVITY * 5.0f * (i + 1));
+        blobs[i].setMass(100.0f);
+        blobs[i].clearAccumulator();
+        world.getParticles().push_back(blobs + i);
+    }
 }
 
 BlobDemo::~BlobDemo()
 {
-    delete blob;
+    delete[] blobs;
+    delete[] platform;
 }
 
 void BlobDemo::display()
 {
     Application::display();
+    for (int i = 0; i < PLATFORM_COUNT; i++)
+    {
+        const Vector2 &p0 = platform[i].start;
+        const Vector2 &p1 = platform[i].end;
 
-    const Vector2 &p0 = platform->start;
-    const Vector2 &p1 = platform->end;
+        glBegin(GL_LINES);
+        glColor3f(0, 1, 1);
+        glVertex2f(p0.x, p0.y);
+        glVertex2f(p1.x, p1.y);
+        glEnd();
 
-    glBegin(GL_LINES);
-    glColor3f(0, 1, 1);
-    glVertex2f(p0.x, p0.y);
-    glVertex2f(p1.x, p1.y);
-    glEnd();
-
-    glColor3f(1, 0, 0);
-
-    const Vector2 &p = blob->getPosition();
-    glPushMatrix();
-    glTranslatef(p.x, p.y, 0);
-    glutSolidSphere(blob->getRadius(), 12, 12);
-    glPopMatrix();
-
+        glColor3f(1, 0, 0);
+    }
+    for (int i = 0; i < BLOB_COUNT; i++)
+    {
+        const Vector2 &p = blobs[i].getPosition();
+        glPushMatrix();
+        glTranslatef(p.x, p.y, 0);
+        glutSolidSphere(blobs[i].getRadius(), 12, 12);
+        glPopMatrix();
+    }
     glutSwapBuffers();
+}
+Platform *BlobDemo::buildPlatform()
+{
+
+    platform = new Platform[PLATFORM_COUNT];
+
+    platform[0].start = Vector2(-50.0, 20.0);
+    platform[0].end = Vector2(0, -20.0);
+
+    platform[1].start = Vector2(50.0, 20.0);
+    platform[1].end = Vector2(0, -20.0);
+
+    return platform;
 }
 
 void BlobDemo::update()
