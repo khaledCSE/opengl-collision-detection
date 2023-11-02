@@ -11,7 +11,10 @@
 #include <cassert>
 
 #define BLOB_COUNT 6
-#define PLATFORM_COUNT 2
+#define PLATFORM_COUNT 6
+#define NUMBER_OF_PLATFORMS 6
+#define BOX_MARGIN 5
+#define NUMBER_OF_BLOBS 3
 
 const Vector2 Vector2::GRAVITY = Vector2(0, -9.81);
 
@@ -40,7 +43,7 @@ unsigned Platform::addContact(ParticleContact *contact,
 {
 
     // const static float restitution = 0.8f;
-    const static float restitution = 1.0f;
+    // const static float restitution = 1.0f;
     unsigned used = 0;
     for (int i = 0; i < BLOB_COUNT; i++)
     {
@@ -61,7 +64,7 @@ unsigned Platform::addContact(ParticleContact *contact,
             {
                 // We have a collision
                 contact->contactNormal = toParticle.unit();
-                contact->restitution = restitution;
+                contact->restitution = coeff_of_restitution;
                 contact->particle[0] = particle + i;
                 contact->particle[1] = 0;
                 contact->penetration = particle[i].getRadius() - toParticle.magnitude();
@@ -77,7 +80,7 @@ unsigned Platform::addContact(ParticleContact *contact,
             {
                 // We have a collision
                 contact->contactNormal = toParticle.unit();
-                contact->restitution = restitution;
+                contact->restitution = coeff_of_restitution;
                 contact->particle[0] = particle + i;
                 contact->particle[1] = 0;
                 contact->penetration = particle[i].getRadius() - toParticle.magnitude();
@@ -95,7 +98,7 @@ unsigned Platform::addContact(ParticleContact *contact,
                 Vector2 closestPoint = start + lineDirection * (projected / platformSqLength);
 
                 contact->contactNormal = (particle[i].getPosition() - closestPoint).unit();
-                contact->restitution = restitution;
+                contact->restitution = coeff_of_restitution;
                 contact->particle[0] = particle + i;
                 contact->particle[1] = 0;
                 contact->penetration = particle[i].getRadius() - sqrt(distanceToPlatform);
@@ -200,9 +203,29 @@ Platform *BlobDemo::buildPlatform()
 
     platform[0].start = Vector2(-50.0, 20.0);
     platform[0].end = Vector2(0, -20.0);
+    platform[0].coeff_of_restitution = 1.0f;
 
     platform[1].start = Vector2(50.0, 20.0);
     platform[1].end = Vector2(0, -20.0);
+    platform[1].coeff_of_restitution = 1.0f;
+
+    // * Creating the box
+    int box_edge_point = nRange - BOX_MARGIN;
+    platform[PLATFORM_COUNT - 4].start = Vector2(-box_edge_point, -box_edge_point);
+    platform[PLATFORM_COUNT - 4].end = Vector2(-box_edge_point, box_edge_point);
+    platform[3].coeff_of_restitution = 1.0f;
+
+    platform[PLATFORM_COUNT - 3].start = Vector2(-box_edge_point, box_edge_point);
+    platform[PLATFORM_COUNT - 3].end = Vector2(box_edge_point, box_edge_point);
+    platform[4].coeff_of_restitution = 1.0f;
+
+    platform[PLATFORM_COUNT - 2].start = Vector2(box_edge_point, box_edge_point);
+    platform[PLATFORM_COUNT - 2].end = Vector2(box_edge_point, -box_edge_point);
+    platform[5].coeff_of_restitution = 1.0f;
+
+    platform[PLATFORM_COUNT - 1].start = Vector2(-box_edge_point, -box_edge_point);
+    platform[PLATFORM_COUNT - 1].end = Vector2(box_edge_point, -box_edge_point);
+    platform[6].coeff_of_restitution = 1.0f;
 
     return platform;
 }
