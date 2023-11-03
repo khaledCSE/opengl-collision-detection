@@ -156,11 +156,15 @@ BlobDemo::BlobDemo() : world(10, 5)
         blobs[i].setPosition(20.0 + i * 10, 90.0);
         blobs[i].setRadius(5);
         blobs[i].setVelocity(0, 0);
-        blobs[i].setDamping(0.9);
+        // * Reducing it will increase the drag, hence a gradual slowing down
+        blobs[i].setDamping(1);
         blobs[i].setAcceleration(Vector2::GRAVITY * 5.0f * (i + 1));
         blobs[i].setMass(100.0f);
         blobs[i].clearAccumulator();
         world.getParticles().push_back(blobs + i);
+
+        // * Randomizing the initial directions
+        blobs[i].setVelocity(randomFloatInRange(-10, 10), randomFloatInRange(-10, 10));
     }
 }
 
@@ -213,19 +217,19 @@ Platform *BlobDemo::buildPlatform()
     int box_edge_point = nRange - BOX_MARGIN;
     platform[PLATFORM_COUNT - 4].start = Vector2(-box_edge_point, -box_edge_point);
     platform[PLATFORM_COUNT - 4].end = Vector2(-box_edge_point, box_edge_point);
-    platform[3].coeff_of_restitution = 1.0f;
+    platform[PLATFORM_COUNT - 4].coeff_of_restitution = 1.0f;
 
     platform[PLATFORM_COUNT - 3].start = Vector2(-box_edge_point, box_edge_point);
     platform[PLATFORM_COUNT - 3].end = Vector2(box_edge_point, box_edge_point);
-    platform[4].coeff_of_restitution = 1.0f;
+    platform[PLATFORM_COUNT - 3].coeff_of_restitution = 1.0f;
 
     platform[PLATFORM_COUNT - 2].start = Vector2(box_edge_point, box_edge_point);
     platform[PLATFORM_COUNT - 2].end = Vector2(box_edge_point, -box_edge_point);
-    platform[5].coeff_of_restitution = 1.0f;
+    platform[PLATFORM_COUNT - 2].coeff_of_restitution = 1.0f;
 
     platform[PLATFORM_COUNT - 1].start = Vector2(-box_edge_point, -box_edge_point);
     platform[PLATFORM_COUNT - 1].end = Vector2(box_edge_point, -box_edge_point);
-    platform[6].coeff_of_restitution = 1.0f;
+    platform[PLATFORM_COUNT - 1].coeff_of_restitution = 1.0f;
 
     return platform;
 }
