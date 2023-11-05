@@ -117,7 +117,7 @@ public:
                                 unsigned limit) const = 0;
 };
 
-class ParticleCollisio
+class ParticleCollision
 {
 };
 
